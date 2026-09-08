@@ -6,23 +6,24 @@ PortLens is a cybersecurity and networking learning project that is being develo
 
 ## Current Version
 
-### v0.1.0 — Basic TCP Scanner
+### v0.2.0 — Port Ranges
 
-The first version focuses on the fundamentals of TCP port scanning.
+Version 0.2.0 extends the basic TCP scanner from scanning a single port to scanning a range of TCP ports.
 
 ### Features
 
-- Accepts a target IP address
-- Accepts a TCP port
-- Attempts a TCP connection to the specified port
-- Reports whether the port is open or closed
-- Uses Python's built-in `socket` module
-- Requires no external Python packages
+* Accepts a target IP address
+* Accepts a starting port
+* Accepts an ending port
+* Scans every port within the specified range
+* Reports whether each port is open or closed
+* Uses Python's built-in `socket` module
+* Requires no external Python packages
 
 ## Requirements
 
-- Python 3.x
-- No external dependencies
+* Python 3.x
+* No external dependencies
 
 ## Usage
 
@@ -32,37 +33,45 @@ Run the scanner with:
 python scanner.py
 ```
 
-The program will ask for a target IP address and port.
+The program will ask for:
+
+```text
+Enter target IP:
+Enter starting port:
+Enter ending port:
+```
 
 Example:
 
 ```text
 Enter target IP: 127.0.0.1
-Enter port: 80
-Port 80 is OPEN
-```
+Enter starting port: 20
+Enter ending port: 25
 
-For a port that cannot be connected to:
-
-```text
-Enter target IP: 127.0.0.1
-Enter port: 9999
-Port 9999 is CLOSED
+Port 20 is CLOSED
+Port 21 is CLOSED
+Port 22 is OPEN
+Port 23 is CLOSED
+Port 24 is CLOSED
+Port 25 is OPEN
 ```
 
 ## How It Works
 
-PortLens creates a TCP socket and attempts to connect to the specified target and port.
+PortLens creates a TCP socket for each port in the specified range and attempts to establish a connection.
 
 ```text
-Target IP + Port
-       |
-       v
-Create TCP Socket
-       |
-       v
-Attempt TCP Connection
-       |
+Target IP
+    |
+    v
+Starting Port ──→ Ending Port
+    |
+    v
+Scan each port
+    |
+    v
+TCP connection attempt
+    |
    +---+---+
    |       |
 Success  Failure
@@ -83,14 +92,17 @@ PortLens/
 
 ## Learning Goals
 
-This version was built to practice:
+Through this version, I practiced:
 
-- Python socket programming
-- TCP connections
-- IP addresses and ports
-- Exception handling
-- Basic network reconnaissance
-- Git and GitHub workflow
+* Python socket programming
+* TCP connections
+* IP addresses and ports
+* Python `range()`
+* Iterating through port ranges
+* Exception handling
+* Proper socket cleanup
+* Basic network reconnaissance
+* Git and GitHub workflow
 
 ## Disclaimer
 
