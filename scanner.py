@@ -1,4 +1,6 @@
 import socket
+import threading
+
 
 services = {
     21: "FTP",
@@ -15,16 +17,11 @@ services = {
     8080: "HTTP Proxy / Alternate HTTP"
 }
 
-target = input("Enter target IP:")
-s_port = int(input("Enter starting port: "))
-e_port = int(input("Enter ending port: "))
-
-
-
-for port in range(s_port, e_port+1):
+def scan_port(port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         sock.connect((target,port))
+
         if port in services:
             print(f"Port {port} is OPEN - {services[port]}")
         else:
@@ -33,3 +30,18 @@ for port in range(s_port, e_port+1):
         print(f"Port {port} is CLOSED")
     finally:
         sock.close()
+
+
+target = input("Enter target IP:")
+s_port = int(input("Enter starting port: "))
+e_port = int(input("Enter ending port: "))
+
+threads = []
+
+for port in range(s_port, e_port+1):
+    thread = threading.Thread(target=scan_port, args=(port,))
+    threads.append(thread)
+    thread.start()
+
+for thread in threads:
+    thread.join()

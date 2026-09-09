@@ -4,7 +4,7 @@ A simple Python-based TCP port scanner built as a cybersecurity learning project
 
 ## Current Version
 
-**v0.3.0 — Service Identification**
+**v0.4.0 — Multithreading**
 
 ## Features
 
@@ -12,6 +12,7 @@ A simple Python-based TCP port scanner built as a cybersecurity learning project
 * Scan a range of TCP ports
 * Identify open and closed ports
 * Identify common services based on port numbers
+* Scan multiple ports concurrently using multithreading
 * Display `Unknown service` for unrecognized ports
 * Simple command-line interface
 
@@ -27,9 +28,33 @@ Port 80 is OPEN → HTTP
 Port 23 is CLOSED
 ```
 
-## Supported Services
+> The order of results may vary because multiple ports are scanned concurrently.
 
-PortLens currently recognizes common services such as:
+## How It Works
+
+PortLens uses Python's built-in `socket` module to establish TCP connections to ports on the target.
+
+In v0.4.0, PortLens uses Python's `threading` module to scan multiple ports concurrently.
+
+Instead of scanning ports sequentially:
+
+```text
+Port 20 → Port 21 → Port 22 → Port 23 → ...
+```
+
+PortLens can scan several ports at the same time:
+
+```text
+Port 20 ─┐
+Port 21 ─┤
+Port 22 ─┼──→ Concurrent scanning
+Port 23 ─┤
+Port 24 ─┘
+```
+
+For each open port, PortLens checks a predefined port-to-service mapping.
+
+## Supported Services
 
 | Port | Service                     |
 | ---- | --------------------------- |
@@ -47,24 +72,6 @@ PortLens currently recognizes common services such as:
 | 8080 | HTTP Proxy / Alternate HTTP |
 
 Ports that are not in the service list are displayed as `Unknown service`.
-
-## How It Works
-
-PortLens uses Python's built-in `socket` module to attempt TCP connections to each port in the specified range.
-
-If the connection succeeds:
-
-```text
-Port 22 is OPEN → SSH
-```
-
-If the connection fails:
-
-```text
-Port 23 is CLOSED
-```
-
-The service name is determined using a predefined port-to-service mapping.
 
 ## Requirements
 
@@ -117,6 +124,7 @@ This project is being developed to learn and practice:
 * Socket programming
 * Port scanning concepts
 * Service identification
+* Multithreading
 * Git and GitHub
 * Cybersecurity fundamentals
 
