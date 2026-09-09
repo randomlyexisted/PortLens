@@ -1,111 +1,128 @@
 # PortLens
 
-A simple TCP port scanner written in Python.
-
-PortLens is a cybersecurity and networking learning project that is being developed incrementally, with each version adding a new capability.
+A simple Python-based TCP port scanner built as a cybersecurity learning project.
 
 ## Current Version
 
-### v0.2.0 — Port Ranges
+**v0.3.0 — Service Identification**
 
-Version 0.2.0 extends the basic TCP scanner from scanning a single port to scanning a range of TCP ports.
+## Features
 
-### Features
+* Scan a target IP address
+* Scan a range of TCP ports
+* Identify open and closed ports
+* Identify common services based on port numbers
+* Display `Unknown service` for unrecognized ports
+* Simple command-line interface
 
-* Accepts a target IP address
-* Accepts a starting port
-* Accepts an ending port
-* Scans every port within the specified range
-* Reports whether each port is open or closed
-* Uses Python's built-in `socket` module
-* Requires no external Python packages
+## Example
+
+```text
+Enter target IP: 127.0.0.1
+Enter starting port: 20
+Enter ending port: 100
+
+Port 22 is OPEN → SSH
+Port 80 is OPEN → HTTP
+Port 23 is CLOSED
+```
+
+## Supported Services
+
+PortLens currently recognizes common services such as:
+
+| Port | Service                     |
+| ---- | --------------------------- |
+| 21   | FTP                         |
+| 22   | SSH                         |
+| 23   | Telnet                      |
+| 25   | SMTP                        |
+| 53   | DNS                         |
+| 80   | HTTP                        |
+| 110  | POP3                        |
+| 143  | IMAP                        |
+| 443  | HTTPS                       |
+| 3306 | MySQL                       |
+| 5432 | PostgreSQL                  |
+| 8080 | HTTP Proxy / Alternate HTTP |
+
+Ports that are not in the service list are displayed as `Unknown service`.
+
+## How It Works
+
+PortLens uses Python's built-in `socket` module to attempt TCP connections to each port in the specified range.
+
+If the connection succeeds:
+
+```text
+Port 22 is OPEN → SSH
+```
+
+If the connection fails:
+
+```text
+Port 23 is CLOSED
+```
+
+The service name is determined using a predefined port-to-service mapping.
 
 ## Requirements
 
 * Python 3.x
-* No external dependencies
+* No external Python packages required
 
-## Usage
+## Installation
 
-Run the scanner with:
+Clone the repository:
+
+```bash
+git clone https://github.com/randomlyexisted/PortLens.git
+```
+
+Navigate to the project directory:
+
+```bash
+cd PortLens
+```
+
+Run the scanner:
 
 ```bash
 python scanner.py
 ```
 
-The program will ask for:
+## Usage
 
-```text
-Enter target IP:
-Enter starting port:
-Enter ending port:
-```
+When prompted, enter:
+
+1. Target IP address
+2. Starting port
+3. Ending port
 
 Example:
 
 ```text
 Enter target IP: 127.0.0.1
-Enter starting port: 20
-Enter ending port: 25
-
-Port 20 is CLOSED
-Port 21 is CLOSED
-Port 22 is OPEN
-Port 23 is CLOSED
-Port 24 is CLOSED
-Port 25 is OPEN
+Enter starting port: 1
+Enter ending port: 100
 ```
 
-## How It Works
-
-PortLens creates a TCP socket for each port in the specified range and attempts to establish a connection.
-
-```text
-Target IP
-    |
-    v
-Starting Port ──→ Ending Port
-    |
-    v
-Scan each port
-    |
-    v
-TCP connection attempt
-    |
-   +---+---+
-   |       |
-Success  Failure
-   |       |
-   v       v
- OPEN    CLOSED
-```
-
-## Project Structure
-
-```text
-PortLens/
-├── scanner.py
-├── README.md
-├── LICENSE
-└── .gitignore
-```
 
 ## Learning Goals
 
-Through this version, I practiced:
+This project is being developed to learn and practice:
 
-* Python socket programming
-* TCP connections
-* IP addresses and ports
-* Python `range()`
-* Iterating through port ranges
-* Exception handling
-* Proper socket cleanup
-* Basic network reconnaissance
-* Git and GitHub workflow
+* Python networking
+* TCP/IP fundamentals
+* Socket programming
+* Port scanning concepts
+* Service identification
+* Git and GitHub
+* Cybersecurity fundamentals
 
 ## Disclaimer
 
-PortLens is intended for **educational purposes and authorized security testing only**.
+PortLens is intended for educational purposes and authorized security testing only.
 
-Only scan systems, networks, and devices that you own or have explicit permission to test.
+Only scan systems and networks that you own or have explicit permission to test.
+
