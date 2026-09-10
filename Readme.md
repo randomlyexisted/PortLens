@@ -4,7 +4,7 @@ A simple Python-based TCP port scanner built as a cybersecurity learning project
 
 ## Current Version
 
-**v0.4.0 — Multithreading**
+**v0.5.0 — Timeouts + Error Handling**
 
 ## Features
 
@@ -13,6 +13,8 @@ A simple Python-based TCP port scanner built as a cybersecurity learning project
 * Identify open and closed ports
 * Identify common services based on port numbers
 * Scan multiple ports concurrently using multithreading
+* Set a connection timeout for each port
+* Handle common socket errors
 * Display `Unknown service` for unrecognized ports
 * Simple command-line interface
 
@@ -24,35 +26,32 @@ Enter starting port: 20
 Enter ending port: 100
 
 Port 22 is OPEN → SSH
-Port 80 is OPEN → HTTP
 Port 23 is CLOSED
+Port 80 is OPEN → HTTP
 ```
 
 > The order of results may vary because multiple ports are scanned concurrently.
 
 ## How It Works
 
-PortLens uses Python's built-in `socket` module to establish TCP connections to ports on the target.
+PortLens uses Python's built-in `socket` module to attempt TCP connections to each port in the specified range.
 
-In v0.4.0, PortLens uses Python's `threading` module to scan multiple ports concurrently.
-
-Instead of scanning ports sequentially:
+Each socket has a **1-second connection timeout**. If a connection does not receive a response within the timeout period, PortLens reports:
 
 ```text
-Port 20 → Port 21 → Port 22 → Port 23 → ...
+Port 445 is FILTERED / TIMEOUT
 ```
 
-PortLens can scan several ports at the same time:
+PortLens also handles different connection results separately:
 
-```text
-Port 20 ─┐
-Port 21 ─┤
-Port 22 ─┼──→ Concurrent scanning
-Port 23 ─┤
-Port 24 ─┘
-```
+| Result               | Meaning                                           |
+| -------------------- | ------------------------------------------------- |
+| `OPEN`               | TCP connection succeeded                          |
+| `CLOSED`             | Connection was actively refused                   |
+| `FILTERED / TIMEOUT` | Connection attempt timed out                      |
+| `ERROR`              | Another socket or operating-system error occurred |
 
-For each open port, PortLens checks a predefined port-to-service mapping.
+For open ports, PortLens checks a predefined port-to-service mapping to provide a likely service name.
 
 ## Supported Services
 
@@ -72,6 +71,26 @@ For each open port, PortLens checks a predefined port-to-service mapping.
 | 8080 | HTTP Proxy / Alternate HTTP |
 
 Ports that are not in the service list are displayed as `Unknown service`.
+
+## Multithreading
+
+Starting with v0.4.0, PortLens uses Python's `threading` module to scan multiple ports concurrently.
+
+Instead of scanning ports one at a time:
+
+```text
+Port 20 → Port 21 → Port 22 → Port 23 → ...
+```
+
+multiple port scans can run concurrently:
+
+```text
+Port 20 ─┐
+Port 21 ─┤
+Port 22 ─┼──→ Concurrent scanning
+Port 23 ─┤
+Port 24 ─┘
+```
 
 ## Requirements
 
@@ -114,7 +133,6 @@ Enter starting port: 1
 Enter ending port: 100
 ```
 
-
 ## Learning Goals
 
 This project is being developed to learn and practice:
@@ -125,6 +143,7 @@ This project is being developed to learn and practice:
 * Port scanning concepts
 * Service identification
 * Multithreading
+* Error handling
 * Git and GitHub
 * Cybersecurity fundamentals
 
@@ -133,4 +152,3 @@ This project is being developed to learn and practice:
 PortLens is intended for educational purposes and authorized security testing only.
 
 Only scan systems and networks that you own or have explicit permission to test.
-

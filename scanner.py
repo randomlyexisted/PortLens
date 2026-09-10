@@ -19,6 +19,8 @@ services = {
 
 def scan_port(port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.settimeout(1)
+
     try:
         sock.connect((target,port))
 
@@ -26,8 +28,12 @@ def scan_port(port):
             print(f"Port {port} is OPEN - {services[port]}")
         else:
             print(f"Port {port} is OPEN - Unknown service")
-    except:
-        print(f"Port {port} is CLOSED")
+    except socket.timeout:
+        print(f"Port {port} is FILTERED / TIMEOUT")
+    except ConnectionRefusedError:
+        print(f"Port {port} is CLOSED");
+    except OSError as e:
+        print(f"Port {port} ERROR: {e}")
     finally:
         sock.close()
 
