@@ -4,7 +4,7 @@ A simple Python-based TCP port scanner built as a cybersecurity learning project
 
 ## Current Version
 
-**v0.5.0 — Timeouts + Error Handling**
+**v0.6.0 — CLI Interface**
 
 ## Features
 
@@ -15,19 +15,70 @@ A simple Python-based TCP port scanner built as a cybersecurity learning project
 * Scan multiple ports concurrently using multithreading
 * Set a connection timeout for each port
 * Handle common socket errors
+* Command-line interface using Python's `argparse`
+* Support both short and long command-line options
 * Display `Unknown service` for unrecognized ports
-* Simple command-line interface
 
-## Example
+## Usage
+
+PortLens uses command-line arguments instead of interactive prompts.
+
+### Basic Command
+
+```bash
+python scanner.py -t 127.0.0.1 -s 1 -e 100
+```
+
+### Long-form Arguments
+
+```bash
+python scanner.py --target 127.0.0.1 --start-port 1 --end-port 100
+```
+
+### Arguments
+
+| Argument | Long Form      | Description              |
+| -------- | -------------- | ------------------------ |
+| `-t`     | `--target`     | Target IP address        |
+| `-s`     | `--start-port` | Starting port            |
+| `-e`     | `--end-port`   | Ending port              |
+| `-h`     | `--help`       | Display help information |
+
+All three scanning arguments (`target`, `start-port`, and `end-port`) are required.
+
+## Help
+
+To view the available options:
+
+```bash
+python scanner.py --help
+```
+
+Example:
 
 ```text
-Enter target IP: 127.0.0.1
-Enter starting port: 20
-Enter ending port: 100
+usage: scanner.py [-h] -t TARGET -s START_PORT -e END_PORT
 
+PortLens - A simple TCP port scanner
+
+options:
+  -h, --help            show this help message and exit
+  -t TARGET, --target TARGET
+                        Target IP address
+  -s START_PORT, --start-port START_PORT
+                        Starting port
+  -e END_PORT, --end-port END_PORT
+                        Ending port
+```
+
+## Example Output
+
+```text
+Port 21 is CLOSED
 Port 22 is OPEN → SSH
 Port 23 is CLOSED
 Port 80 is OPEN → HTTP
+Port 443 is OPEN → HTTPS
 ```
 
 > The order of results may vary because multiple ports are scanned concurrently.
@@ -36,13 +87,9 @@ Port 80 is OPEN → HTTP
 
 PortLens uses Python's built-in `socket` module to attempt TCP connections to each port in the specified range.
 
-Each socket has a **1-second connection timeout**. If a connection does not receive a response within the timeout period, PortLens reports:
+Each socket has a **1-second connection timeout**.
 
-```text
-Port 445 is FILTERED / TIMEOUT
-```
-
-PortLens also handles different connection results separately:
+PortLens handles different connection results separately:
 
 | Result               | Meaning                                           |
 | -------------------- | ------------------------------------------------- |
@@ -52,6 +99,22 @@ PortLens also handles different connection results separately:
 | `ERROR`              | Another socket or operating-system error occurred |
 
 For open ports, PortLens checks a predefined port-to-service mapping to provide a likely service name.
+
+## Multithreading
+
+PortLens uses Python's `threading` module to scan multiple ports concurrently.
+
+Each port is assigned to a separate thread:
+
+```text
+Port 20 ─┐
+Port 21 ─┤
+Port 22 ─┼──→ Concurrent scanning
+Port 23 ─┤
+Port 24 ─┘
+```
+
+This allows PortLens to perform multiple connection attempts without waiting for each port to finish before starting the next one.
 
 ## Supported Services
 
@@ -72,26 +135,6 @@ For open ports, PortLens checks a predefined port-to-service mapping to provide 
 
 Ports that are not in the service list are displayed as `Unknown service`.
 
-## Multithreading
-
-Starting with v0.4.0, PortLens uses Python's `threading` module to scan multiple ports concurrently.
-
-Instead of scanning ports one at a time:
-
-```text
-Port 20 → Port 21 → Port 22 → Port 23 → ...
-```
-
-multiple port scans can run concurrently:
-
-```text
-Port 20 ─┐
-Port 21 ─┤
-Port 22 ─┼──→ Concurrent scanning
-Port 23 ─┤
-Port 24 ─┘
-```
-
 ## Requirements
 
 * Python 3.x
@@ -111,26 +154,10 @@ Navigate to the project directory:
 cd PortLens
 ```
 
-Run the scanner:
+Run PortLens:
 
 ```bash
-python scanner.py
-```
-
-## Usage
-
-When prompted, enter:
-
-1. Target IP address
-2. Starting port
-3. Ending port
-
-Example:
-
-```text
-Enter target IP: 127.0.0.1
-Enter starting port: 1
-Enter ending port: 100
+python scanner.py -t 127.0.0.1 -s 1 -e 100
 ```
 
 ## Learning Goals
@@ -144,6 +171,7 @@ This project is being developed to learn and practice:
 * Service identification
 * Multithreading
 * Error handling
+* Command-line interfaces
 * Git and GitHub
 * Cybersecurity fundamentals
 

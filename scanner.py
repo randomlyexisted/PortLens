@@ -1,5 +1,6 @@
 import socket
 import threading
+import argparse
 
 
 services = {
@@ -38,9 +39,36 @@ def scan_port(port):
         sock.close()
 
 
-target = input("Enter target IP:")
-s_port = int(input("Enter starting port: "))
-e_port = int(input("Enter ending port: "))
+parser = argparse.ArgumentParser(description="PortLens - A simple TCP port scanner")
+
+parser.add_argument(
+    "-t",
+    "--target",
+    required=True,
+    help="Target IP address"
+)
+
+parser.add_argument(
+    "-s",
+    "--start-port",
+    type=int,
+    required=True,
+    help="Starting port"
+)
+
+parser.add_argument(
+    "-e",
+    "--end-port",
+    type=int,
+    required=True,
+    help="Ending port"
+)
+
+args = parser.parse_args()
+
+target = args.target
+s_port = args.start_port
+e_port = args.end_port
 
 threads = []
 
