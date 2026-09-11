@@ -22,6 +22,18 @@ services = {
 results = []
 lock = threading.Lock()
 
+def grab_banner(sock,port):
+    try:
+        if port in [80,8080]:
+            request = b"HEAD / HTTP/1.0\r\nHost: localhost\r\n\r\n"
+            sock.sendall(request)
+        banner = sock.recv(1024)
+        return banner.decode(errors="ignore").strip()
+    except socket.timeout:
+        return ""
+    except OSError:
+        return ""
+
 def scan_port(port):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.settimeout(1)
@@ -29,7 +41,8 @@ def scan_port(port):
     result = {
         "port": port,
         "state": "",
-        "service": ""
+        "service": "",
+        "banner": ""
     }
 
     try:
@@ -41,12 +54,15 @@ def scan_port(port):
             result["service"] = services[port] 
         else:
             result["service"] ="Unknown"
+
+        result["banner"] = grab_banner(sock,port)
+
     except socket.timeout:
         result["state"] = "FILTERED / TIMEOUT"
         result["service"] = ""
-    except ConnectionRefusedError:
+    except ConnectionRefusedError :
         result["state"] = "CLOSED"
-        result["service"] = str(e)
+        result["service"] = ""
     except OSError as e:
         result["state"] = "ERROR"
         result["service"] = str(e)
@@ -64,7 +80,7 @@ def save_csv(filename):
     with open(filename, "w", newline="")as file:
         writer = csv.DictWriter(
             file,
-            fieldnames=["port","state","service"]
+            fieldnames=["port","state","service","banner"]
         )
         writer.writeheader()
         writer.writerows(results)
@@ -110,7 +126,7 @@ args = parser.parse_args()
 try:
     target = socket.gethostbyname(args.target)
     print(f"Resolved {args.target} → {target}")
-except:
+except socket.gaierror:
     print(f"Could not resolve target: {args.target}")
     exit()
 
@@ -130,14 +146,28 @@ for thread in threads:
 results.sort(key=lambda x: x["port"])
     
 for result in results:
-    if result["service"]:
-        print(f"Port {result['port']} is "
-              f"{result['state']} → {result['service']}"
-            )
-    else:
+    if result["state"] == "OPEN":
+        print(
+            f"Port {result['port']} is OPEN → "
+            f"{result['service']}"
+        )
+        if result["banner"]:
+            print(f"Banner: {result['banner']}")
+        else:
+            print("Banner: No banner")
+    elif result["state"] == "FILTERED / TIMEOUT":
         print(
             f"Port {result['port']} is "
-            f"{result['state']}"
+            f"FILTERED / TIMEOUT"
+        )
+    elif result["state"] == "CLOSED":
+        print(
+            f"Port {result['port']} is CLOSED"
+        )
+    else:
+        print(
+            f"Port {result['port']} ERROR: "
+            f"{result['service']}"
         )
 
 if args.json:
