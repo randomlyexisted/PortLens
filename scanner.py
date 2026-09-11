@@ -66,7 +66,13 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-target = args.target
+try:
+    target = socket.gethostbyname(args.target)
+    print(f"Resolved {args.target} → {target}")
+except:
+    print(f"Could not resolve target: {args.target}")
+    exit()
+
 s_port = args.start_port
 e_port = args.end_port
 
